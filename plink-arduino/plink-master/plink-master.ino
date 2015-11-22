@@ -6,8 +6,6 @@
  *  - recieve commands from slave devices to dismiss alert
  *  - connect to WiFi
  *  - sync medication alert times
- *  
- *  TODO: Wireup the hardware. Check if LEDs turn on. Check if broadcasting works
  */
  
 #include <Printers.h>
@@ -125,6 +123,11 @@ void loop() {
                             (medicationTimesArr[hour()+24] == 1 && minute() == 0 && second() == 0);
 
   if(enableAlertButtonState == HIGH || medicationAlertOn) {
+    //TODO only do this once! right now this gets called multiple times
+    //because medicationAlertOn is true for multiple clock cycles (1 second)
+    //but this is low priority since this doesnt really affect anything
+    //negatively. 
+    
     turnOnAlertLed();
     broadcastEnableAlert();
   }
