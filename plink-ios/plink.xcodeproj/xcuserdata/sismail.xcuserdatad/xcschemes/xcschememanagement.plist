@@ -4,7 +4,7 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>plink.xcscheme</key>
+		<key>Plink.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>0</integer>
@@ -12,7 +12,7 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>8F28F0AF1C029086003598CE</key>
+		<key>8FC432BC1C0296A600397C34</key>
 		<dict>
 			<key>primary</key>
 			<true/>
