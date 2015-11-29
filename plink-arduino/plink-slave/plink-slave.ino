@@ -29,8 +29,13 @@ bool isSending;
 bool isDismissing;
 
 int piezoPin = 8;
+
+int toneCount = 0;
 bool alertEnabled = false;
-bool clockTimeSync = false;
+
+bool startTone = false;
+bool needToSendEnableAlertCmd = false;
+bool needToSendDismissAlertCmd = false;
 
 XBee xbee;
 
@@ -63,6 +68,13 @@ void setup() {
 }
 
 void loop() {   
+
+  if(startTone == false) { 
+    tone(piezoPin, 200, 300);
+    delay(600);
+    tone(piezoPin, 200, 50);
+    startTone = true;
+  }
   //======================
   // PROCESS XBEE REQUEST
   //======================
@@ -102,10 +114,25 @@ void loop() {
   // MANAGE ALERT AUDIO
   //=====================
   if(alertEnabled) {
-    tone(piezoPin, 200, 500);
+    if(toneCount == 500) {
+      toneCount = 1000;
+    }
+    else if(toneCount == 501) {
+      toneCount = 0;
+    }
+    else if(toneCount < 500) {
+      tone(piezoPin, 200, 100);
+      toneCount++;
+    }
+    else {
+      tone(piezoPin, 600, 100);
+      toneCount--;
+    }
+    //delay(50);
+    //tone(piezoPin, 60, 100);
   }
   
-  delay(10);
+  //delay(10);
 }
 
 void turnOnAlertLed() {

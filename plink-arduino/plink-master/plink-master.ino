@@ -33,6 +33,8 @@ bool isSending;
 bool isDismissing;
 
 int piezoPin = 8;
+
+int toneCount = 0;
 bool alertEnabled = false;
 bool clockTimeSync = false;
 
@@ -76,14 +78,16 @@ void loop() {
   if(data!=0) {
     if(clockTimeSync == false) {
       //setting time manually for debugging purposes
-      setTime(21,58,30,22,11,2015);
-      
-      //setupClockTime(data);
+      //setTime(6,29,50,29,11,2015);
+
+      setupClockTime(data);
       clockTimeSync = true;
+      tone(piezoPin, 200, 300);
       retrieveMedicationTimesRequest();
     }
     else {
       setupMedicationTimes(data);
+      tone(piezoPin, 200, 50);
     }
   }
 
@@ -120,7 +124,7 @@ void loop() {
   // MANAGE ALERT (LED & BROADCAST)
   //===============================
   bool medicationAlertOn = (medicationTimesArr[hour()] == 1 && minute() == 0 && second() == 0) ||
-                            (medicationTimesArr[hour()+24] == 1 && minute() == 0 && second() == 0);
+                            (medicationTimesArr[hour()+24] == 1 && minute() == 30 && second() == 0);
 
   if(enableAlertButtonState == HIGH || medicationAlertOn) {
     //TODO only do this once! right now this gets called multiple times
@@ -141,18 +145,34 @@ void loop() {
   // MANAGE ALERT AUDIO
   //=====================
   if(alertEnabled) {
-    tone(piezoPin, 200, 500);
+    if(toneCount == 500) {
+      toneCount = 1000;
+    }
+    else if(toneCount == 501) {
+      toneCount = 0;
+    }
+    else if(toneCount < 500) {
+      tone(piezoPin, 200, 100);
+      toneCount++;
+    }
+    else {
+      tone(piezoPin, 600, 100);
+      toneCount--;
+    }
+    //delay(50);
+    //tone(piezoPin, 60, 100);
   }
   
-  delay(10);
+  //delay(10);
 }
 
 void setupClockTime(char* data)
 {
+  Serial.println("Clock Time Setup:");
   Serial.println(data);
   short count = 0;
   int timeArr[6];
-  
+
   char* next_word = strtok(data, "-");
   while (next_word != NULL) {
     int nextNum = atoi(next_word);

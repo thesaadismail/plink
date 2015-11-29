@@ -9,7 +9,7 @@ WiFiClient client;
 bool sentConnection = false;
 bool gettingData = false;
 
-char ipAddr[] = "10.0.0.20";
+char ipAddr[] = "http://plink-55964.onmodulus.net";
 
 char ssid[] = "";     //  your network SSID (name) 
 char pass[] = "";    // your network password
@@ -45,11 +45,11 @@ void retrieveMedicationTimesRequest() {
     Serial.println("\nretrieving medication times request");
     Serial.println("Starting connection to server...");
     // if you get a connection, report back via serial:
-    if (client.connect(ipAddr, 8888)) {
+    if (client.connect(ipAddr, 80)) {
       Serial.println("connected to server");
       // Make a HTTP request:
       client.println("GET /retrieveTimes HTTP/1.1");
-      client.println("Host: 10.0.0.20");
+      client.println("Host: plink-55964.onmodulus.net");
       client.println("Connection: close");
       client.println();
     }
@@ -64,11 +64,11 @@ void retrieveClockTimeRequest() {
   Serial.println("\nretrieving clock time request");
   Serial.println("Starting connection to server...");
   // if you get a connection, report back via serial:
-  if (client.connect(ipAddr, 8888)) {
+  if (client.connect(ipAddr, 80)) {
     Serial.println("connected to server");
     // Make a HTTP request:
     client.println("GET /getClockTimeForArduino HTTP/1.1");
-    client.println("Host: 10.0.0.20");
+    client.println("Host: plink-55964.onmodulus.net");
     client.println("Connection: close");
     client.println();
   }
