@@ -44,10 +44,10 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         afternoonTimes = setupTimeSectionArray(12,endRange: 16,timesArr: afternoonTimes);
         
         var eveningTimes = [MedTime]()
-        eveningTimes = setupTimeSectionArray(16,endRange: 20,timesArr: eveningTimes);
+        eveningTimes = setupTimeSectionArray(17,endRange: 20,timesArr: eveningTimes);
         
         var nightTimes = [MedTime]()
-        nightTimes = setupTimeSectionArray(20, endRange: 23, timesArr: nightTimes);
+        nightTimes = setupTimeSectionArray(21, endRange: 23, timesArr: nightTimes);
         nightTimes = setupTimeSectionArray(0, endRange: 4, timesArr: nightTimes);
         
         genericTimesData.append(morningTimes);

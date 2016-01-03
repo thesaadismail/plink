@@ -34,8 +34,11 @@ int toneCount = 0;
 bool alertEnabled = false;
 
 bool startTone = false;
-bool needToSendEnableAlertCmd = false;
-bool needToSendDismissAlertCmd = false;
+bool isConfirming = false;
+
+bool waitingForSendAlertConfirmation = false;
+bool waitingForDismissAlertConfirmation = false;
+
 
 XBee xbee;
 
@@ -100,12 +103,12 @@ void loop() {
   //===============================
   // MANAGE ALERT (LED & BROADCAST)
   //===============================
-  if(enableAlertButtonState == HIGH) {
+  if(enableAlertButtonState == HIGH || waitingForSendAlertConfirmation) {
     turnOnAlertLed();
     broadcastEnableAlert();
   }
 
-  if(dismissAlertButtonState == HIGH) {
+  if(dismissAlertButtonState == HIGH || waitingForDismissAlertConfirmation) {
     turnOffAlertLed();
     broadcastDismissAlert();  
   }
@@ -155,7 +158,38 @@ void broadcastEnableAlert() {
      Serial.println("Done Sending Enable Broadcast. Status: ");
      Serial.println(successful);
      Serial.println("-----------------------------------");
+     //waitingForSendAlertConfirmation = true;
      isSending = false;
+  }
+}
+
+void broadcastCONFIRMEnableAlert() {
+  if(isConfirming == false)
+  {
+     isConfirming = true;
+     Serial.println("Sending CONFIRM Enable Broadcast");
+     uint8_t payload[] = {generateConfirmEnableAlertCmd()};
+     Tx16Request tx = Tx16Request(0xFFFF, payload, sizeof(payload));
+     boolean successful = sendMessage(tx, false);
+     Serial.println("Done Sending CONFIRM Enable Broadcast. Status: ");
+     Serial.println(successful);
+     Serial.println("-----------------------------------");
+     isConfirming = false;
+  }
+}
+
+void broadcastCONFIRMDismissAlert() {
+  if(isConfirming == false)
+  {
+     isConfirming = true;
+     Serial.println("Sending CONFIRM Dismiss Broadcast");
+     uint8_t payload[] = {generateConfirmDismissAlertCmd()};
+     Tx16Request tx = Tx16Request(0xFFFF, payload, sizeof(payload));
+     boolean successful = sendMessage(tx, false);
+     Serial.println("Done Sending CONFIRM Dismiss Broadcast. Status: ");
+     Serial.println(successful);
+     Serial.println("-----------------------------------");
+     isConfirming = false;
   }
 }
 
@@ -172,6 +206,7 @@ void broadcastDismissAlert() {
      Serial.println("Done Sending Dismiss Broadcast. Status: ");
      Serial.println(successful);
      Serial.println("-----------------------------------");
+     //waitingForDismissAlertConfirmation = true;
      isDismissing = false;
   }
 }
@@ -179,8 +214,16 @@ void broadcastDismissAlert() {
 void processData(uint8_t command) {
   if(command == generateEnableAlertCmd()) {
     turnOnAlertLed();
+    //broadcastCONFIRMEnableAlert();
   }
   else if(command == generateDismissAlertCmd()) {
     turnOffAlertLed();
+    //broadcastCONFIRMDismissAlert();
+  }
+  else if(command = generateConfirmEnableAlertCmd()) {
+    waitingForSendAlertConfirmation = false;
+  }
+  else if(command = generateConfirmDismissAlertCmd()) {
+    waitingForDismissAlertConfirmation = false;
   }
 }

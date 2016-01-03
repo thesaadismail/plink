@@ -35,8 +35,11 @@ bool isDismissing;
 int piezoPin = 8;
 
 int toneCount = 0;
+int timerMinute = -1;
 bool alertEnabled = false;
 bool clockTimeSync = false;
+
+bool isConfirming = false;
 
 XBee xbee;
 
@@ -67,7 +70,7 @@ void setup() {
   xbee = XBee();
   xbee.setSerial(Serial); 
 
-  medicationTimesArr[16-1] = 1; 
+  //medicationTimesArr[16-1] = 1; 
 
   connectToWiFiNetwork();
   retrieveClockTimeRequest();
@@ -139,12 +142,22 @@ void loop() {
   if(dismissAlertButtonState == HIGH) {
     turnOffAlertLed();
     broadcastDismissAlert();  
+    timerMinute = -1;
   }
 
   //=====================
   // MANAGE ALERT AUDIO
   //=====================
   if(alertEnabled) {
+    if(timerMinute == -1) {
+      timerMinute = minute();
+    }
+    else if(minute() - timerMinute >= 2) {
+      alertEnabled = false;
+      timerMinute = -1;
+      broadcastDismissAlert(); 
+    }
+    
     if(toneCount == 500) {
       toneCount = 1000;
     }
@@ -238,7 +251,8 @@ void broadcastEnableAlert() {
      boolean successful = sendMessage(tx, false);
      Serial.println("Done Sending Enable Broadcast. Status: ");
      Serial.println(successful);
-     Serial.println("-----------------------------------");
+     Serial.println("");
+     //waitingForSendAlertConfirmation = true;
      isSending = false;
   }
 }
@@ -255,7 +269,8 @@ void broadcastDismissAlert() {
    
      Serial.println("Done Sending Dismiss Broadcast. Status: ");
      Serial.println(successful);
-     Serial.println("-----------------------------------");
+     Serial.println("");
+     //waitingForDismissAlertConfirmation = true;
      isDismissing = false;
   }
 }
@@ -263,23 +278,10 @@ void broadcastDismissAlert() {
 void processData(uint8_t command) {
   if(command == generateEnableAlertCmd()) {
     turnOnAlertLed();
+    //broadcastCONFIRMEnableAlert();
   }
   else if(command == generateDismissAlertCmd()) {
     turnOffAlertLed();
+    //broadcastCONFIRMDismissAlert();
   }
 }
-
-void resetDevice() {
-  //reset device will clear items stored in memory and create a new PAN ID.
-  //the destination address will always be 0 for the master device
-  //the source address should be a wildcard so it can broadcast to all devices in the PAN
-
-  clearItemsFromMemory();
-  short randomPan = (short) generateRandomPAN();
-  storePANInMemory(randomPan);
-}
-
-int generateRandomPAN() {
-  return random(65535);
-}
-

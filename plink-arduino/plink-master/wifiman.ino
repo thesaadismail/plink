@@ -9,25 +9,22 @@ WiFiClient client;
 bool sentConnection = false;
 bool gettingData = false;
 
-char ipAddr[] = "http://plink-55964.onmodulus.net";
+char ipAddr[] = "plink-55964.onmodulus.net";
 
 char ssid[] = "";     //  your network SSID (name) 
 char pass[] = "";    // your network password
-int status = WL_IDLE_STATUS;     // the Wifi radio's status
 
-char macChar[] = "DEADBEEFFEED";     //  your network SSID (name) 
-byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+int status = WL_IDLE_STATUS;     // the Wifi radio's status
 
 void connectToWiFiNetwork()
 {
-  // attempt to connect using WPA2 encryption:
+  // attempt to cuonnect using WPA2 encryption:
   Serial.println("Attempting to connect to WPA network...");
   status = WiFi.begin(ssid, pass);
 
   // if you're not connected, stop here:
   if ( status != WL_CONNECTED) { 
     Serial.println("Couldn't get a wifi connection");
-    while(true);
   } 
   // if you are connected, print out info about the connection:
   else {
